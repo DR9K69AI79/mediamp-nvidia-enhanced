@@ -161,6 +161,44 @@ bool mpv_handle_t::detach_android_surface(JNIEnv *env) {
 #endif
 }
 
+bool mpv_handle_t::attach_desktop_surface(int64_t windowHandle) {
+    FP;
+    LOCK(surface_access_lock);
+    CHECK_HANDLE()
+    
+#ifndef __ANDROID__
+    if (desktop_surface_attached_) detach_desktop_surface();
+    
+    desktop_window_handle_ = windowHandle;
+    desktop_surface_attached_ = mpv_set_option(handle_, "wid", MPV_FORMAT_INT64, &windowHandle) >= 0;
+    
+    return desktop_surface_attached_;
+#else
+    LOG("attach_desktop_surface is not implemented on Android");
+    return false;
+#endif
+}
+
+bool mpv_handle_t::detach_desktop_surface() {
+    FP;
+    LOCK(surface_access_lock);
+    CHECK_HANDLE()
+    
+#ifndef __ANDROID__
+    if (!desktop_surface_attached_) return false;
+    
+    int64_t wid = 0;
+    bool result = mpv_set_option(handle_, "wid", MPV_FORMAT_INT64, (void*) &wid) >= 0;
+    desktop_window_handle_ = 0;
+    desktop_surface_attached_ = false;
+    
+    return result;
+#else
+    LOG("detach_desktop_surface is not implemented on Android");
+    return false;
+#endif
+}
+
 bool mpv_handle_t::destroy(JNIEnv *env) {
     FP;
     CHECK_HANDLE()

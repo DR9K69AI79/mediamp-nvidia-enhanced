@@ -107,14 +107,12 @@ actual class MpvMediampPlayer (
             is Platform.Windows -> {
                 handle.option("gpu-context", "d3d11")
                 handle.option("opengl-es", "no")
-
-                handle.option("ao", "audiotrack")
+                handle.option("ao", "wasapi")
             }
             is Platform.MacOS -> {
                 handle.option("gpu-context", "macvk")
                 handle.option("opengl-es", "no")
-
-                handle.option("ao", "audiotrack")
+                handle.option("ao", "coreaudio")
             }
 
             else -> { }
@@ -142,6 +140,13 @@ actual class MpvMediampPlayer (
         handle.option("force-window", "no")
         handle.option("idle", "yes")
         handle.option("keep-open", "always")
+
+        when (currentPlatform()) {
+            is Platform.Windows -> {
+                handle.setPropertyString("vf", "d3d11vpp=scale=2:scaling-mode=nvidia")
+            }
+            else -> { }
+        }
 
         handle.observeProperty("time-pos/full", MPVFormat.MPV_FORMAT_INT64)
         handle.observeProperty("duration/full", MPVFormat.MPV_FORMAT_INT64)

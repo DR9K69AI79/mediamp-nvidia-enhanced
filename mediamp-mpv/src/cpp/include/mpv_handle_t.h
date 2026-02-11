@@ -35,6 +35,9 @@ public:
     bool attach_android_surface(JNIEnv *env, jobject surface);
     bool detach_android_surface(JNIEnv *env);
     
+    bool attach_desktop_surface(int64_t windowHandle);
+    bool detach_desktop_surface();
+    
 private:
     JavaVM *jvm_;
     mpv_handle *handle_;
@@ -44,6 +47,9 @@ private:
 #ifdef __ANDROID__
     bool surface_attached_ = false;
     jobject surface_;
+#else
+    bool desktop_surface_attached_ = false;
+    int64_t desktop_window_handle_ = 0;
 #endif
 
     std::shared_ptr<mediampv::compatible_thread> event_thread_;

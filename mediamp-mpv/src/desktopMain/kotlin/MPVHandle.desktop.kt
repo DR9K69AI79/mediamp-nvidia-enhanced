@@ -9,11 +9,21 @@
 
 package org.openani.mediamp.mpv
 
+import org.openani.mediamp.InternalMediampApi
 
+@InternalMediampApi
+external fun nAttachDesktopSurface(ptr: Long, windowHandle: Long): Boolean
+
+@InternalMediampApi
+external fun nDetachDesktopSurface(ptr: Long): Boolean
+
+@OptIn(InternalMediampApi::class)
 internal actual fun attachSurface(ptr: Long, surface: Any): Boolean {
-    TODO("Not yet implemented")
+    check(surface is Long) { "surface must be a Long (HWND on Windows)" }
+    return nAttachDesktopSurface(ptr, surface)
 }
 
+@OptIn(InternalMediampApi::class)
 internal actual fun detachSurface(ptr: Long): Boolean {
-    TODO()
+    return nDetachDesktopSurface(ptr)
 }
